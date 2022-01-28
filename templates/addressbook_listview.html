@@ -1,14 +1,33 @@
 {% extends 'homepage.html' %}
 {% block content %}
 
-    <div class="card" style="width: 18rem; margin-bottom: 10%">
-    {% for contact in contacts %}
-        <div class="card-body">
-            <h5 class="card-title">{{ contact.name }} {{ contact.surname }}</h5>
-            <p class="card-text">{{ contact.phone }}</p>
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
+    <div class="card text-center">
+        <div class="card-header">
+            <ul class="nav nav-pills card-header-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contacts' %}">View contacts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'addressbook' %}">Add contact</a>
+                </li>
+            </ul>
         </div>
-    {% endfor %}
+    </div>
+    <div class="container mb-4 mt-4 align-items-center" style="width: 50%;">
+    <h2 class="text-center">List of contacts</h2>
+        <ul class="list-group">
+            {% for contact in contacts %}
+            <li class="list-group-item border-0">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ contact.name }} {{ contact.surname }}</h4>
+                        <p class="card-text">{{ contact.phone }}</p>
+                        <a href="" class="card-link">Edit</a>
+                        <a href="{% url 'delete' contact.id%}" class="card-link">Delete</a>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}
