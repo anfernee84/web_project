@@ -1,0 +1,14 @@
+{% extends 'homepage.html' %}
+{% block content %}
+
+    <div class="card" style="width: 18rem; margin-bottom: 10%">
+    {% for contact in contacts %}
+        <div class="card-body">
+            <h5 class="card-title">{{ contact.name }} {{ contact.surname }}</h5>
+            <p class="card-text">{{ contact.phone }}</p>
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}
