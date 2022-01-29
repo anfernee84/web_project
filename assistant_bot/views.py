@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import AddressBook
 from django.urls import reverse_lazy
+from django.db.models import Q
 # Create your views here.
 
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DetailView
@@ -21,6 +22,13 @@ class AddressBookView(ListView):
     model = AddressBook
     template_name = 'addressbook_listview.html'
     context_object_name = 'contacts'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(AddressBookView, self).get_context_data(**kwargs)
+        search_input = self.request.GET.get('search-area')
+        if search_input:
+            context['contacts'] = AddressBook.objects.filter(Q(name__startswith=search_input)|Q(surname__startswith=search_input))
+        return context
 
 
 def delete_addressbook(response, pk):
