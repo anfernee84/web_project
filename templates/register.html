@@ -1,0 +1,28 @@
+{% extends 'homepage.html' %}
+{% block content %}
+
+    {% for msg in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong> Try again!
+    </div>
+    {% endfor %}
+
+
+    <div class="container-fluid justify-content-between mt-5" style="width: 35%; height: auto; min-height: 60vh">
+        <form class="text-center border border-light p-5 justify-content-center" method="post" style="">
+
+            <p class="h4 mb-4">Register</p>
+            {% csrf_token %}
+            <input class="form-control mb-4" placeholder="Username" type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus="" required="" id="id_username">
+    <!-- Password -->
+            <input class="form-control mb-4" placeholder="Password" type="password" name="password1" autocomplete="new-password" required="" id="id_password1">
+            <input class="form-control mb-4" placeholder="Repeat password" type="password" name="password2" autocomplete="new-password" required="" id="id_password2">
+    <!-- Sign in button -->
+            <button class="btn btn-info btn-block my-4" type="submit">Register</button>
+    <!-- Register -->
+            <p>Are you a member?
+                <a href="{% url 'login' %}">Login</a>
+            </p>
+        </form>
+    </div>
+{% endblock %}
