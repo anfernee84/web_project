@@ -1,5 +1,8 @@
+import datetime
+
 from django.shortcuts import render
 from .models import AddressBook
+from .forms import AddAddressBook
 from django.urls import reverse_lazy
 from django.db.models import Q
 # Create your views here.
@@ -36,7 +39,6 @@ class RegisterPage(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(RegisterPage, self).get_context_data(**kwargs)
-        print(context)
         return context
 
     def form_invalid(self, form):
@@ -50,7 +52,7 @@ class HomePage(TemplateView):
 
 class AddressBookCreate(CreateView):
     model = AddressBook
-    fields = ['name', 'surname', 'phone', 'email', 'street']
+    form_class = AddAddressBook
     template_name = 'addressbook_add.html'
     success_url = reverse_lazy('contacts')
 
@@ -66,10 +68,24 @@ class AddressBookView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(AddressBookView, self).get_context_data(**kwargs)
-        search_input = self.request.GET.get('search-area')
         context['contacts'] = context['contacts'].filter(user=self.request.user)
+        if context['contacts']:
+            context['is_empty'] = '0'
+
+        today_date = datetime.date.today()
+
+        search_input = self.request.GET.get('search-area')
+        b_day = self.request.GET.get('b-day')
+        all_input = self.request.GET.get('all')
+
         if search_input:
             context['contacts'] = context['contacts'].filter(Q(name__startswith=search_input)|Q(surname__startswith=search_input))
+
+        if b_day:
+            context['contacts'] = context['contacts'].filter(birthday__month__gte=today_date.month, birthday__month__lte=today_date.month + 1)
+
+        if all_input is not None:
+            context['contacts'] = AddressBook.objects.filter(user=self.request.user)
 
         return context
 
@@ -85,7 +101,7 @@ class AddressBookUpdate(LoginRequiredMixin, UpdateView):
     model = AddressBook
     template_name = 'addressbook_update.html'
     context_object_name = 'contact'
-    fields = ['name', 'surname', 'phone', 'email', 'street']
+    form_class = AddAddressBook
     success_url = reverse_lazy('contacts')
 
 

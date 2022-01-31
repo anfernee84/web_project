@@ -14,17 +14,27 @@
         </div>
     </div>
     <div class="container mb-4 mt-4 align-items-center" style="width: 40%; min-height: 50vh; height: auto">
-    <h2 class="text-center">List of contacts</h2>
 
+        <h2 class="text-center">List of contacts</h2>
+        {% if is_empty %}
         <ul class="list-group bg-white">
             <li class="list-group-item border-0">
-                <form class="form-inline" style="width: 70%; text-decoration-color: pink">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                    <input class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search contact" name="search-area"
-                           aria-label="Search">
+                <form method="get">
+                    <div class="row">
+                        <div class="col ">
+                             <input class="form-control form-control-sm" type="text" placeholder="Search contact" name="search-area"
+                               aria-label="Search">
+                        </div>
+                        <div class="col col-lg-4">
+                             <input class="form-control form-control-sm ml-3" type="submit" value="B-day celebrants" name="b-day">
+                        </div>
+                        <div class="col col-lg-2">
+                             <input class="form-control form-control-sm ml-3" type="submit" value="All" name="all">
+                        </div>
+                    </div>
                 </form>
-
             </li>
+
             {% for contact in contacts %}
             <li class="list-group-item border-0">
                 <div class="card bg-white">
@@ -69,6 +79,16 @@
                 </div>
             </li>
             {% endfor %}
+        {% else %}
+                <li class="list-group-item border-0">
+                    <div class="card bg-white">
+                        <div class="card-body">
+                            <h3 class="card-title text-center">No items available</h3>
+                            <p class="card-text text-center">Try to <a href="{% url 'addressbook' %}">add</a> it</p>
+                        </div>
+                    </div>
+                </li>
+        {% endif %}
         </ul>
     </div>
 {% endblock %}

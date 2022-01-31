@@ -10,6 +10,7 @@ url_patterns = [
     path('task-delete/<int:pk>', delete_addressbook, name='delete'),
     path('task-update/<int:pk>', AddressBookUpdate.as_view(), name='update'),
     path('contact-view/<int:pk>', AddressBookDetail.as_view(), name='contact'),
+
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('register/', RegisterPage.as_view(), name='register')
