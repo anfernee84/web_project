@@ -80,9 +80,10 @@ class AddressBookView(LoginRequiredMixin, ListView):
 
         if search_input:
             context['contacts'] = context['contacts'].filter(Q(name__startswith=search_input)|Q(surname__startswith=search_input))
+            return context
 
         if b_day:
-            context['contacts'] = context['contacts'].filter(birthday__month__gte=today_date.month, birthday__month__lte=today_date.month + 1)
+            context['contacts'] = AddressBook.objects.filter(user=self.request.user, birthday__month__gte=today_date.month, birthday__month__lte=today_date.month + 1)
 
         if all_input is not None:
             context['contacts'] = AddressBook.objects.filter(user=self.request.user)
@@ -94,7 +95,7 @@ class AddressBookView(LoginRequiredMixin, ListView):
 def delete_addressbook(response, pk):
     model = AddressBook.objects.filter(id=pk)
     model.delete()
-    return render(response, 'addressbook_listview.html', {'contacts': AddressBook.objects.filter(user=response.user)})
+    return render(response, 'addressbook_listview.html', {'contacts': AddressBook.objects.filter(user=response.user), 'is_empty': '1'})
 
 
 class AddressBookUpdate(LoginRequiredMixin, UpdateView):
