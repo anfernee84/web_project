@@ -1,7 +1,7 @@
 import datetime
-
+from re import split
 from django.shortcuts import render
-from .models import AddressBook
+from .models import AddressBook, NoteBook
 from .forms import AddAddressBook
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -110,3 +110,64 @@ class AddressBookDetail(LoginRequiredMixin, DetailView):
     model = AddressBook
     template_name = 'addressbook_detailview.html'
     context_object_name = 'contact'
+
+
+class NoteBookCreate(CreateView):
+    model = NoteBook
+
+    fields = ['title', 'description', 'tags']
+    template_name = 'notebook_add.html'
+    success_url = reverse_lazy('notes')
+
+    def form_valid(self, form):
+        tags = form.instance.tags
+        form.instance.user = self.request.user
+        if tags:
+            form.instance.tags = split(r'[,;+-= ]', tags[0])
+        return super(NoteBookCreate, self).form_valid(form)
+
+
+class NoteBookDetail(LoginRequiredMixin, DetailView):
+    model = NoteBook
+    template_name = 'notebook_detail_view.html'
+    context_object_name = 'note'
+
+
+class NoteBookUpdate(LoginRequiredMixin, UpdateView):
+    model = NoteBook
+    template_name = 'notebook_update.html'
+    fields = ['title', 'description', 'tags']
+    success_url = reverse_lazy('notes')
+
+
+class NoteBookView(LoginRequiredMixin, ListView):
+    model = NoteBook
+    template_name = 'notebook_listview.html'
+    context_object_name = 'notes'
+    
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(NoteBookView, self).get_context_data(**kwargs)
+        tag_set = set()
+        search_input = self.request.GET.get('search-area')
+
+        if search_input:
+            context['notes'] = context['notes'].filter(title__startswith=search_input)
+
+        for tag_item in NoteBook.objects.values_list('tags', flat=True).order_by('tags'):
+            if tag_item:
+                for tag in tag_item:
+                    tag_set.add(tag)
+        context['filter_tags'] = tag_set
+        return context
+
+
+@login_required
+def delete_notebook(response, pk):
+    model = NoteBook.objects.filter(id=pk)
+    model.delete()
+    tag_set = set()
+    for tag_item in NoteBook.objects.values_list('tags', flat=True).order_by('tags'):
+        if tag_item:
+            for tag in tag_item:
+                tag_set.add(tag)
+    return render(response, 'notebook_listview.html', {'notes': NoteBook.objects.filter(user=response.user), 'filter_tags': tag_set})

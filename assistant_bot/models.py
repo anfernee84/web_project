@@ -2,13 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.contrib.postgres.fields import ArrayField
+
+
 # Create your models here.
 
 
 def validate_phone():
     return RegexValidator(r"^\+?(38)?0(44|67|68|96|97|98|50|66|95|99|63|73|93|89|94)\d{7}$",
                           'Enter correct number'
-    )
+                          )
 
 
 class AddressBook(models.Model):
