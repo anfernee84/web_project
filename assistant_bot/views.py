@@ -1,6 +1,6 @@
 import datetime
 from re import split
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from .models import AddressBook, NoteBook
 from .forms import AddAddressBook
 from django.urls import reverse_lazy
@@ -95,7 +95,6 @@ class AddressBookView(LoginRequiredMixin, ListView):
 def delete_addressbook(response, pk):
     model = AddressBook.objects.filter(id=pk)
     model.delete()
-    # return render(response, 'addressbook_listview.html', {'contacts': AddressBook.objects.filter(user=response.user), 'is_empty': '1'})
     return redirect('contacts')
 
 
@@ -153,9 +152,12 @@ class NoteBookView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NoteBookView, self).get_context_data(**kwargs)
+        context['notes'] = context['notes'].filter(user=self.request.user)
+
         tag_set = set()
         search_input = self.request.GET.get('search-area')
-        filter_tags = get_tags_from_request(self.request.GET)
+        filter_tags = get_tags_from_request(self.request.GET, self.request.user)
+
         if filter_tags:
             context['notes'] = context['notes'].filter(tags__overlap=filter_tags)
 
@@ -163,8 +165,7 @@ class NoteBookView(LoginRequiredMixin, ListView):
             context['notes'] = context['notes'].filter(title__contains=search_input)
             return context
 
-        for tag_item in NoteBook.objects.values_list('tags', flat=True).order_by('tags'):
-
+        for tag_item in context['notes'].values_list('tags', flat=True).order_by('tags'):
             if tag_item:
                 for tag in tag_item:
                     tag_set.add(tag)
@@ -172,8 +173,8 @@ class NoteBookView(LoginRequiredMixin, ListView):
         return context
 
 
-def get_tags_from_request(get_request):
-    all_tags = NoteBook.objects.values_list('tags', flat=True)
+def get_tags_from_request(get_request, user):
+    all_tags = NoteBook.objects.filter(user=user).values_list('tags', flat=True)
     searched_tags = []
     for tag_item in all_tags:
         if tag_item:
@@ -192,5 +193,4 @@ def delete_notebook(response, pk):
         if tag_item:
             for tag in tag_item:
                 tag_set.add(tag)
-    # return render(response, 'notebook_listview.html', {'notes': NoteBook.objects.filter(user=response.user), 'filter_tags': tag_set})
     return redirect('notes')
