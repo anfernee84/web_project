@@ -13,13 +13,20 @@
             </ul>
         </div>
     </div>
+    {% load static %}
     <div class="container-fluid justify-content-center mt-2 mb-2" style="width: 400px; height: auto">
         <div class="card justify-content-center">
-            <img class="card-img-top" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" style="width: auto; height: 80%">
+{#            <img class="card-img-top" src="{% static '/images/notes.png' %}" style="width: auto; height: 80%">#}
             <div class="card-body">
-                <h2 class="card-title">Note title</h2>
-                <p class="card-text">Note text</p>
+                <h2 class="card-title">{{ note.title }}</h2>
+                <p class="card-text">{{ note.description }}</p>
+                <ul class="list-group list-group-horizontal">
+                    {% for item in note.tags %}
+                    <li class="list-group-item">{{ item }}</li>
+                    {% endfor %}
+                </ul>
             </div>
+
         </div>
 
     </div>

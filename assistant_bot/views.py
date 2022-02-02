@@ -1,6 +1,6 @@
 import datetime
 from re import split
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import AddressBook, NoteBook
 from .forms import AddAddressBook
 from django.urls import reverse_lazy
@@ -24,6 +24,10 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('homepage')
 
+    def form_invalid(self, form):
+        messages.success(self.request, 'Incorrect password or login')
+        return super(CustomLoginView, self).form_invalid(form)
+
 
 class RegisterPage(FormView):
     template_name = 'register.html'
@@ -36,10 +40,6 @@ class RegisterPage(FormView):
         if user is not None:
             login(self.request, user)
         return super(RegisterPage, self).form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super(RegisterPage, self).get_context_data(**kwargs)
-        return context
 
     def form_invalid(self, form):
         messages.success(self.request, 'Your password is too common!')
@@ -95,7 +95,8 @@ class AddressBookView(LoginRequiredMixin, ListView):
 def delete_addressbook(response, pk):
     model = AddressBook.objects.filter(id=pk)
     model.delete()
-    return render(response, 'addressbook_listview.html', {'contacts': AddressBook.objects.filter(user=response.user), 'is_empty': '1'})
+    # return render(response, 'addressbook_listview.html', {'contacts': AddressBook.objects.filter(user=response.user), 'is_empty': '1'})
+    return redirect('contacts')
 
 
 class AddressBookUpdate(LoginRequiredMixin, UpdateView):
@@ -123,7 +124,7 @@ class NoteBookCreate(CreateView):
         tags = form.instance.tags
         form.instance.user = self.request.user
         if tags:
-            form.instance.tags = split(r'[,;+-= ]', tags[0])
+            form.instance.tags = split(r'[,;+= ]', tags[0])
         return super(NoteBookCreate, self).form_valid(form)
 
 
@@ -131,6 +132,11 @@ class NoteBookDetail(LoginRequiredMixin, DetailView):
     model = NoteBook
     template_name = 'notebook_detail_view.html'
     context_object_name = 'note'
+
+    def get_context_data(self, **kwargs):
+        context = super(NoteBookDetail, self).get_context_data(**kwargs)
+
+        return context
 
 
 class NoteBookUpdate(LoginRequiredMixin, UpdateView):
@@ -149,16 +155,32 @@ class NoteBookView(LoginRequiredMixin, ListView):
         context = super(NoteBookView, self).get_context_data(**kwargs)
         tag_set = set()
         search_input = self.request.GET.get('search-area')
+        filter_tags = get_tags_from_request(self.request.GET)
+        if filter_tags:
+            context['notes'] = context['notes'].filter(tags__overlap=filter_tags)
 
         if search_input:
-            context['notes'] = context['notes'].filter(title__startswith=search_input)
+            context['notes'] = context['notes'].filter(title__contains=search_input)
+            return context
 
         for tag_item in NoteBook.objects.values_list('tags', flat=True).order_by('tags'):
+
             if tag_item:
                 for tag in tag_item:
                     tag_set.add(tag)
         context['filter_tags'] = tag_set
         return context
+
+
+def get_tags_from_request(get_request):
+    all_tags = NoteBook.objects.values_list('tags', flat=True)
+    searched_tags = []
+    for tag_item in all_tags:
+        if tag_item:
+            for tag in tag_item:
+                if get_request.get(tag):
+                    searched_tags.append(tag)
+    return searched_tags
 
 
 @login_required
@@ -170,4 +192,5 @@ def delete_notebook(response, pk):
         if tag_item:
             for tag in tag_item:
                 tag_set.add(tag)
-    return render(response, 'notebook_listview.html', {'notes': NoteBook.objects.filter(user=response.user), 'filter_tags': tag_set})
+    # return render(response, 'notebook_listview.html', {'notes': NoteBook.objects.filter(user=response.user), 'filter_tags': tag_set})
+    return redirect('notes')

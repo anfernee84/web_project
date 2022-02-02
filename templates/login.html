@@ -1,6 +1,11 @@
 {% extends 'homepage.html' %}
 {% load crispy_forms_filters %}
 {% block content %}
+    {% for msg in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong> Try again!
+    </div>
+    {% endfor %}
 
 
 <!-- Default form login -->

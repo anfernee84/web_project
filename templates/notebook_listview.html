@@ -13,8 +13,8 @@
             </ul>
         </div>
     </div>
-    <div class="container-fluid border-0 mt-2 mb-2"></div>
-        <div class="row">
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
             <div class="col col-md-2">
                 <div class="card">
                     <article class="card-group-item">
@@ -24,21 +24,28 @@
                         <div class="filter-content">
                             <div class="card-body">
                                 <form method="get">
+                                {% if filter_tags%}
                                     {% for tag in filter_tags %}
                                         <label class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="1" name="{{ tag }}" {% if tag in request.GET%} checked {% endif %}>
+                                            <input class="form-check-input" type="checkbox" value="1" name="{{ tag }}" {% if tag in request.GET%} checked {% endif %} >
                                             <span class="form-check-label">
                                             {{ tag }}
                                         </span>
                                         </label>
                                     {% endfor %}
-                                    <input class="btn btn-secondary mt-3" type="submit" value="Find">
+                                        <input class="btn btn-secondary mt-3" type="submit" value="Find">
+
+                                {% else %}
+                                    <p class="card-text">No tags available</p>
+                                {% endif %}
                                 </form>
                             </div> <!-- card-body.// -->
                         </div>
                     </article> <!-- card-group-item.// -->
                 </div>
-            </div>
+
+
+        </div>
             <div class="col offset-2 col-md-4" style="min-height: 50vh; height: auto">
                     <h2 class="text-center">List of notes</h2>
                     <ul class="list-group bg-white">
@@ -50,7 +57,7 @@
                                                aria-label="Search">
                                     </div>
                                     <div class="col col-lg-3">
-                                        <input class="form-control form-control-sm ml-3" type="submit" value="All" name="all">
+                                        <input class="form-control form-control-sm ml-3" type="submit" value="Reset filters" name="all">
                                     </div>
                                 </div>
                             </form>
@@ -60,6 +67,7 @@
                                 <li class="list-group-item border-0">
                                     <div class="card bg-white">
                                         <div class="card-header bg-white border-0 justify-content-end" style="height: 30px;">
+
                                             <ul class="list-group list-group-horizontal justify-content-end">
                                                 <li class="list-group-item">
                                                     <a href="{% url 'delete_note' note.id %}">
@@ -78,20 +86,27 @@
                                                         </svg>
                                                     </a>
                                                 </li>
-                                                <li class="list-group-item">
-                                                    <a href="{% url 'note' note.id %}">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-minus" viewBox="0 0 16 16">
-                                                            <path fill-rule="evenodd" d="M5.5 9.5A.5.5 0 0 1 6 9h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>
-                                                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                                                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-                                                        </svg>
-                                                    </a>
-                                                </li>
+{#                                                <li class="list-group-item">#}
+{#                                                    <a href="{% url 'note' note.id %}">#}
+{#                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-minus" viewBox="0 0 16 16">#}
+{#                                                            <path fill-rule="evenodd" d="M5.5 9.5A.5.5 0 0 1 6 9h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>#}
+{#                                                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>#}
+{#                                                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>#}
+{#                                                        </svg>#}
+{#                                                    </a>#}
+{#                                                </li>#}
                                             </ul>
                                         </div>
                                         <div class="card-body bg-white">
-                                            <h4 class="card-title">{{ note.title }}</h4>
-                                            <p class="card-text">{{ note.tags }}</p>
+                                            <h4 class="card-title ml-3">{{ note.title|capfirst}}</h4>
+                                            <p class="card-text">{{ note.description }}</p>
+                                           <div class="container-fluid">
+                                               <div class="row">
+                                               {% for item in note.tags %}
+                                                   <div class="col col-md-3 py-2"><a class="btn btn-outline-dark" href="/view-notes/?{{ item }}=1">{{ item }}</a></div>
+                                               {% endfor %}
+                                                </div>
+                                           </div>
                                         </div>
                                     </div>
                                 </li>
