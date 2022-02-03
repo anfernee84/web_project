@@ -3,7 +3,7 @@ from django.contrib.auth.views import LogoutView
 
 from .views import HomePage, AddressBookCreate, AddressBookView, delete_addressbook, AddressBookUpdate, \
     AddressBookDetail, CustomLoginView, RegisterPage, show_world_news, show_finance_news, show_sport_news, \
-    show_entertainment_news, show_hacker_news, show_weather
+    show_entertainment_news, show_hacker_news, show_weather, currency_converter
 
 url_patterns = [
     path('', HomePage.as_view(), name='homepage'),
@@ -20,5 +20,6 @@ url_patterns = [
     path('sport/', show_sport_news, name='sport'),
     path('entertainment/', show_entertainment_news, name='entertainment'),
     path('hacker/', show_hacker_news, name='hacker'),
-    path('weather/', show_weather, name='weather')
+    path('weather/', show_weather, name='weather'),
+    path('currency/', currency_converter, name='currency')
 ]

@@ -15,7 +15,10 @@ from newsapi import NewsApiClient
 
 import json
 
+import requests
+
 import urllib.request
+import urllib.parse
 
 from datetime import datetime
 
@@ -84,7 +87,7 @@ class AddressBookView(LoginRequiredMixin, ListView):
         return context
 
 
-@login_required
+# @login_required
 def delete_addressbook(response, pk):
     model = AddressBook.objects.filter(id=pk)
     model.delete()
@@ -105,7 +108,7 @@ class AddressBookDetail(LoginRequiredMixin, DetailView):
     context_object_name = 'contact'
 
 
-@login_required
+# @login_required
 def show_world_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
     top = newsapi.get_top_headlines(sources='bbc-news')
@@ -114,18 +117,20 @@ def show_world_news(request):
     desc = []
     news = []
     img = []
+    url = []
 
     for i in range(len(content)):
         text = content[i]
         news.append(text['title'])
         desc.append(text['description'])
         img.append(text['urlToImage'])
-    mylist = zip(news, desc, img)
+        url.append(text['url'])
+    mylist = zip(news, desc, img, url)
 
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -136,7 +141,7 @@ def show_world_news(request):
     return render(request=request, template_name='news_page.html', context={'mylist': mylist, 'data': data})
 
 
-@login_required
+# @login_required
 def show_finance_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
     top = newsapi.get_top_headlines(sources='business-insider')
@@ -145,18 +150,20 @@ def show_finance_news(request):
     desc = []
     news = []
     img = []
+    url = []
 
     for i in range(len(content)):
         text = content[i]
         news.append(text['title'])
         desc.append(text['description'])
         img.append(text['urlToImage'])
-    mylist = zip(news, desc, img)
+        url.append(text['url'])
+    mylist = zip(news, desc, img, url)
 
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -167,7 +174,7 @@ def show_finance_news(request):
     return render(request=request, template_name='finance_page.html', context={'mylist': mylist, 'data': data})
 
 
-@login_required()
+# @login_required()
 def show_sport_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
     top = newsapi.get_top_headlines(sources='bbc-sport')
@@ -176,18 +183,20 @@ def show_sport_news(request):
     desc = []
     news = []
     img = []
+    url = []
 
     for i in range(len(content)):
         text = content[i]
         news.append(text['title'])
         desc.append(text['description'])
         img.append(text['urlToImage'])
-    mylist = zip(news, desc, img)
+        url.append(text['url'])
+    mylist = zip(news, desc, img, url)
 
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -198,7 +207,7 @@ def show_sport_news(request):
     return render(request=request, template_name='sport_page.html', context={'mylist': mylist, 'data': data})
 
 
-@login_required()
+# @login_required()
 def show_entertainment_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
     top = newsapi.get_top_headlines(sources='buzzfeed')
@@ -207,18 +216,20 @@ def show_entertainment_news(request):
     desc = []
     news = []
     img = []
+    url = []
 
     for i in range(len(content)):
         text = content[i]
         news.append(text['title'])
         desc.append(text['description'])
         img.append(text['urlToImage'])
-    mylist = zip(news, desc, img)
+        url.append(text['url'])
+    mylist = zip(news, desc, img, url)
 
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -229,7 +240,7 @@ def show_entertainment_news(request):
     return render(request=request, template_name='entertainment_page.html', context={'mylist': mylist, 'data': data})
 
 
-@login_required
+# @login_required
 def show_hacker_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
     top = newsapi.get_top_headlines(sources='hacker-news')
@@ -238,18 +249,20 @@ def show_hacker_news(request):
     desc = []
     news = []
     img = []
+    url = []
 
     for i in range(len(content)):
         text = content[i]
         news.append(text['title'])
         desc.append(text['description'])
         img.append(text['urlToImage'])
-    mylist = zip(news, desc, img)
+        url.append(text['url'])
+    mylist = zip(news, desc, img, url)
 
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -260,12 +273,12 @@ def show_hacker_news(request):
     return render(request=request, template_name='hacker_page.html', context={'mylist': mylist, 'data': data})
 
 
-@login_required()
+# @login_required()
 def show_weather(request):
     user_location = json.loads(urllib.request.urlopen('http://ipinfo.io/json').read())
     weather_url = urllib.request.urlopen(
         f"https://api.openweathermap.org/"
-        f"data/2.5/weather?q={user_location['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+        f"data/2.5/weather?q={urllib.parse.quote(user_location['city'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
     ).read()
     weather_data = json.loads(weather_url)
     data = {
@@ -280,12 +293,12 @@ def show_weather(request):
         'visibility_m': (weather_data['visibility'] / 1609).__round__(1),
         'pressure': weather_data['main']['pressure'],
         'humidity': weather_data['main']['humidity'],
-        'dt': datetime.fromtimestamp(weather_data['dt']).ctime()
+        'dt': datetime.now().date().ctime().replace(' 00:00:00', ',')
     }
     if request.method == 'POST':
         weather_url = urllib.request.urlopen(
             f"https://api.openweathermap.org/"
-            f"data/2.5/weather?q={request.POST['city']}&appid=206c04ecd30711b37b3e460efd0e40d7"
+            f"data/2.5/weather?q={urllib.parse.quote(request.POST['location'])}&appid=206c04ecd30711b37b3e460efd0e40d7"
         ).read()
         weather_data = json.loads(weather_url)
         data = {
@@ -300,7 +313,59 @@ def show_weather(request):
             'visibility_m': (weather_data['visibility'] / 1609).__round__(1),
             'pressure': weather_data['main']['pressure'],
             'humidity': weather_data['main']['humidity'],
-            'dt': datetime.fromtimestamp(weather_data['dt']).ctime()
+            'dt': datetime.now().date().ctime().replace(' 00:00:00', ',')
         }
-        return render(request=request, template_name='result_weather_page.html', context={'data': data})
+        return render(request=request, template_name='weather_page.html', context={'data': data})
     return render(request=request, template_name='weather_page.html', context={'data': data})
+
+
+# @login_required
+def currency_converter(request):
+    response = requests.get('https://api.exchangerate.host/latest')
+    result = response.json()
+    data = {
+        'aud': result['rates']['AUD'].__round__(2),
+        'bgn': result['rates']['BGN'].__round__(2),
+        'brl': result['rates']['BRL'].__round__(2),
+        'cad': result['rates']['CAD'].__round__(2),
+        'chf': result['rates']['CHF'].__round__(2),
+        'cny': result['rates']['CNY'].__round__(2),
+        'czk': result['rates']['CZK'].__round__(2),
+        'dkk': result['rates']['DKK'].__round__(2),
+        'eur': result['rates']['EUR'].__round__(2),
+        'gbp': result['rates']['GBP'].__round__(2),
+        'hkd': result['rates']['HKD'].__round__(2),
+        'hrk': result['rates']['HRK'].__round__(2),
+        'huf': result['rates']['HUF'].__round__(2),
+        'idr': result['rates']['IDR'].__round__(2),
+        'ils': result['rates']['ILS'].__round__(2),
+        'inr': result['rates']['INR'].__round__(2),
+        'isk': result['rates']['ISK'].__round__(2),
+        'jpy': result['rates']['JPY'].__round__(2),
+        'krw': result['rates']['KRW'].__round__(2),
+        'mxn': result['rates']['MXN'].__round__(2),
+        'myr': result['rates']['MYR'].__round__(2),
+        'nok': result['rates']['NOK'].__round__(2),
+        'nzd': result['rates']['NZD'].__round__(2),
+        'php': result['rates']['PHP'].__round__(2),
+        'pln': result['rates']['PLN'].__round__(2),
+        'ron': result['rates']['RON'].__round__(2),
+        'rub': result['rates']['RUB'].__round__(2),
+        'sek': result['rates']['SEK'].__round__(2),
+        'sgd': result['rates']['SGD'].__round__(2),
+        'thb': result['rates']['THB'].__round__(2),
+        'try': result['rates']['TRY'].__round__(2),
+        'uah': result['rates']['UAH'].__round__(2),
+        'usd': result['rates']['USD'].__round__(2),
+        'zar': result['rates']['ZAR'].__round__(2),
+    }
+
+    if request.method == 'POST':
+        if request.POST.get('currency_first') == request.POST.get('currency_second'):
+            exchange = int(request.POST.get('amount'))
+            return render(request=request, template_name='currency.html', context={'data': data, 'exchange': exchange})
+        else:
+            exchange = ((int(request.POST.get('amount')) * result['rates'][request.POST.get('currency_first')]) *
+                        result['rates'][request.POST.get('currency_second')]).__round__(2)
+            return render(request=request, template_name='currency.html', context={'data': data, 'exchange': exchange})
+    return render(request=request, template_name='currency.html', context={'data': data})

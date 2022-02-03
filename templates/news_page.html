@@ -9,13 +9,14 @@ crossorigin="anonymous">
     </h1>
 </div>
 <div class="container; text-center">
-    {% for new, des, i in mylist %}
+    {% for new, des, i, url in mylist %}
+        <h2><a style="color:black" href="{{ url }}">- {{ new }} -</a></h2>
+        {{ value|linebreaks }}
+        <p>{{ des }}</p>
+        {{ value|linebreaks }}
         <img src="{{ i }}" alt="">
-        <h1>News:</h1> {{ new }}
-        {{ value|linebreaks }}
 
-        <h4>Description:</h4> {{ des }}
-        {{ value|linebreaks }}
+        <hr style="height:10px">
     {% endfor %}
 </div>
 </body>
