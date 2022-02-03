@@ -17,7 +17,7 @@
         <div class="container-fluid">
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="navbar-brand" href=""><img src="https://cdn-icons.flaticon.com/png/512/4166/premium/4166244.png?token=exp=1643360558~hmac=51af1c74bc4c990cbe8401983ff81200" width="40" ></a></li>
+                    <li class="nav-item"><a class="navbar-brand" href="{% url 'homepage' %}"><img src="{% static '/images/chatbot.png' %}" width="40" ></a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'homepage' %}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contacts' %}">Address book</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'notes' %}">Notes</a></li>
@@ -70,7 +70,7 @@
         <hr class="deep-purple accent-2 mb-4 mt-0 d-inline-block mx-auto" style="width: 60px;">
         <p>Here you can use rows and columns to organize your footer content. Lorem ipsum dolor sit amet,
           consectetur
-          adipisicing elit {{ request.data }}</p>
+          adipisicing elit </p>
 
       </div>
 
