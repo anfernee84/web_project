@@ -5,6 +5,7 @@ from .models import AddressBook, NoteBook
 from .forms import AddAddressBook
 from django.urls import reverse_lazy
 from django.db.models import Q
+from calendar import monthrange
 # Create your views here.
 
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DetailView
@@ -44,7 +45,7 @@ class RegisterPage(FormView):
     def form_invalid(self, form):
         messages.success(self.request, 'Your password is too common!')
         return super(RegisterPage, self).form_invalid(form)
-        
+
 
 class HomePage(TemplateView):
     template_name = 'homepage.html'
@@ -79,11 +80,20 @@ class AddressBookView(LoginRequiredMixin, ListView):
         all_input = self.request.GET.get('all')
 
         if search_input:
-            context['contacts'] = context['contacts'].filter(Q(name__startswith=search_input)|Q(surname__startswith=search_input))
+            context['contacts'] = context['contacts'].filter(
+                Q(name__startswith=search_input) | Q(surname__startswith=search_input))
             return context
 
         if b_day:
-            context['contacts'] = AddressBook.objects.filter(user=self.request.user, birthday__month__gte=today_date.month, birthday__month__lte=today_date.month + 1)
+            if today_date.day + 7 <= monthrange(today_date.year, today_date.month)[1]:
+                context['contacts'] = context['contacts'].filter(birthday__month=today_date.month,
+                                                                 birthday__day__range=(
+                                                                     today_date.day, today_date.day + 7))
+            elif today_date.day + 7 > monthrange(today_date.year, today_date.month)[1]:
+                diff_days = today_date.day + 7 - monthrange(today_date.year, today_date.month)[1]
+                context['contacts'] = context['contacts'].filter(Q(birthday__month=today_date.month + 1,
+                                                                 birthday__day__range=(
+                                                                     1, diff_days))|Q(birthday__month=today_date.month, birthday__day__range=(today_date.day, today_date.day+7)))
 
         if all_input is not None:
             context['contacts'] = AddressBook.objects.filter(user=self.request.user)
@@ -149,7 +159,7 @@ class NoteBookView(LoginRequiredMixin, ListView):
     model = NoteBook
     template_name = 'notebook_listview.html'
     context_object_name = 'notes'
-    
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NoteBookView, self).get_context_data(**kwargs)
         context['notes'] = context['notes'].filter(user=self.request.user)
