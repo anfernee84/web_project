@@ -1,5 +1,5 @@
 body {
-    background-image: -webkit-linear-gradient(#e0c3fc, #8ec5fc);
+    background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(198,224,250,1) 100%);
     background-repeat: no-repeat;
     background-position: center 0;
     background-attachment: fixed;
@@ -14,6 +14,10 @@ body {
     width: 200px
 }
 
+.news-scroll a {
+    text-decoration: none
+}
+
 .dot {
     height: 6px;
     width: 6px;
@@ -26,34 +30,29 @@ body {
 }
 
 * {
-    padding: 0;
-    margin: 0;
-    font-family: 'IBM Plex Sans', sans-serif
-}
-
-body {
-     height: 100vh;
-     width: 100vw;
-     overflow-x: hidden
+     font-family: 'IBM Plex Sans', sans-serif
 }
 
 .currency-row-outer {
+    position: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%
+    height: 600px;
+    text-align: center;
 }
 
 .currency-converter {
     width: 100%;
-    max-width: 480px;
-    text-align: center
+    max-width: 500px;
+    text-align: center;
 }
 
 input,
 select {
     color: #363636;
     font-size: 1rem;
+    text-align: center;
     height: 2.3em;
     border-radius: 4px;
     max-width: 100%;
@@ -62,10 +61,8 @@ select {
     outline: 0;
     background: #fff;
     border-color: #dbdbdb;
-    padding-left: 15px;
     border: 1px solid #00000057;
     box-shadow: inset 0 0.0625em 0.125em rgb(10 10 10 / 5%);
-    -webkit-appearance: none
 }
 
 .field.grid-50-50 {
@@ -75,23 +72,23 @@ select {
 }
 
 .currency-converter .colmun {
-    margin-bottom: 15px
+    margin-bottom: 25px;
 }
 
 select.currency {
     border-color: #3273dc;
-    width: 100%;
-    height: 100%;
+    width: 500px;
+    height: 50px;
     cursor: pointer;
     font-size: 1em;
     max-width: 100%;
     outline: 0;
-    display: block
+    display: block;
 }
 
 .currency-converter .select {
-    position: relative;
-    height: 100%
+    position: center;
+    height: 100%;
 }
 
 h2 {
@@ -113,13 +110,15 @@ h2 {
     position: absolute;
     top: 50%;
     right: 1.125em;
-    margin-top: -0.4375em
+    margin-top: -0.4375em;
 }
 
-.select:not(:hover)::after {
-    border-color: #3273dc
+.btn{
+    margin:30px;
+    width: 400px;
 }
 
-.select:hover::after {
-    border-color: #363636
+.output{
+    font-size:30px;
+    font-weight: bold;
 }

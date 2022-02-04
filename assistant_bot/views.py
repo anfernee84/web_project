@@ -241,9 +241,9 @@ def show_entertainment_news(request):
 
 
 # @login_required
-def show_hacker_news(request):
+def show_tech_news(request):
     newsapi = NewsApiClient(api_key='92ee8fd958374204ada73045c7fe5936')
-    top = newsapi.get_top_headlines(sources='hacker-news')
+    top = newsapi.get_top_headlines(sources='techcrunch')
 
     content = top['articles']
     desc = []
@@ -270,7 +270,7 @@ def show_hacker_news(request):
         'temp_c': (weather_data['main']['temp'] - 273.15).__round__(1),
         'temp_f': ((weather_data['main']['temp'] - 273.15) * 9 / 5 + 32).__round__(1)}
 
-    return render(request=request, template_name='hacker_page.html', context={'mylist': mylist, 'data': data})
+    return render(request=request, template_name='tech_page.html', context={'mylist': mylist, 'data': data})
 
 
 # @login_required()
@@ -361,11 +361,23 @@ def currency_converter(request):
     }
 
     if request.method == 'POST':
-        if request.POST.get('currency_first') == request.POST.get('currency_second'):
-            exchange = int(request.POST.get('amount'))
-            return render(request=request, template_name='currency.html', context={'data': data, 'exchange': exchange})
+        if request.POST.get('amount') == '':
+            amount = 1
+            exchange = (((1 / result['rates'][request.POST.get('currency_first')]) *
+                        result['rates'][request.POST.get('currency_second')]) *
+                        amount).__round__(3)
+            exchange_out = f"1 {request.POST.get('currency_first')} = " \
+                           f"{exchange} {request.POST.get('currency_second')}"
+            return render(request=request, template_name='currency.html', context={
+                'data': data, 'exchange_out': exchange_out
+            })
         else:
-            exchange = ((int(request.POST.get('amount')) * result['rates'][request.POST.get('currency_first')]) *
-                        result['rates'][request.POST.get('currency_second')]).__round__(2)
-            return render(request=request, template_name='currency.html', context={'data': data, 'exchange': exchange})
+            exchange = (((1 / result['rates'][request.POST.get('currency_first')]) *
+                         result['rates'][request.POST.get('currency_second')]) *
+                        int(request.POST.get('amount'))).__round__(3)
+            exchange_out = f"{request.POST.get('amount')} {request.POST.get('currency_first')} = " \
+                           f"{exchange} {request.POST.get('currency_second')}"
+            return render(request=request, template_name='currency.html', context={
+                'data': data, 'exchange_out': exchange_out
+            })
     return render(request=request, template_name='currency.html', context={'data': data})
