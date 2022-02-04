@@ -361,23 +361,12 @@ def currency_converter(request):
     }
 
     if request.method == 'POST':
-        if request.POST.get('amount') == '':
-            amount = 1
-            exchange = (((1 / result['rates'][request.POST.get('currency_first')]) *
-                        result['rates'][request.POST.get('currency_second')]) *
-                        amount).__round__(3)
-            exchange_out = f"1 {request.POST.get('currency_first')} = " \
-                           f"{exchange} {request.POST.get('currency_second')}"
-            return render(request=request, template_name='currency.html', context={
-                'data': data, 'exchange_out': exchange_out
-            })
-        else:
-            exchange = (((1 / result['rates'][request.POST.get('currency_first')]) *
-                         result['rates'][request.POST.get('currency_second')]) *
-                        int(request.POST.get('amount'))).__round__(3)
-            exchange_out = f"{request.POST.get('amount')} {request.POST.get('currency_first')} = " \
-                           f"{exchange} {request.POST.get('currency_second')}"
-            return render(request=request, template_name='currency.html', context={
-                'data': data, 'exchange_out': exchange_out
-            })
+        exchange = (((1 / result['rates'][request.POST.get('currency_first')]) *
+                     result['rates'][request.POST.get('currency_second')]) *
+                    int(request.POST.get('amount'))).__round__(3)
+        exchange_out = f"{request.POST.get('amount')} {request.POST.get('currency_first')} = " \
+                       f"{exchange} {request.POST.get('currency_second')}"
+        return render(request=request, template_name='currency.html', context={
+            'data': data, 'exchange_out': exchange_out
+        })
     return render(request=request, template_name='currency.html', context={'data': data})
