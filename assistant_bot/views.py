@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .models import AddressBook, NoteBook, GetListFile
+from django.shortcuts import render
+from .models import AddressBook
 from django.urls import reverse_lazy
 from django.db.models import Q
 
@@ -10,8 +10,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
-
-from django.core.files.storage import FileSystemStorage
 
 from newsapi import NewsApiClient
 
@@ -24,17 +22,7 @@ import urllib.parse
 
 from datetime import datetime
 
-from re import split
-
-from calendar import monthrange
-
 from pycountry import countries
-
-import os
-
-from distutils import file_util
-
-from idna import valid_contextj
 
 
 class CustomLoginView(LoginView):
@@ -90,37 +78,11 @@ class AddressBookView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(AddressBookView, self).get_context_data(**kwargs)
-        context['contacts'] = context['contacts'].filter(user=self.request.user)
-        if context['contacts']:
-            context['is_empty'] = '0'
-
-        today_date = datetime.date.today()
-
         search_input = self.request.GET.get('search-area')
-        b_day = self.request.GET.get('b-day')
-        all_input = self.request.GET.get('all')
-
+        context['contacts'] = context['contacts'].filter(user=self.request.user)
         if search_input:
             context['contacts'] = context['contacts'].filter(
                 Q(name__startswith=search_input) | Q(surname__startswith=search_input))
-            return context
-
-        if b_day:
-            if today_date.day + 7 <= monthrange(today_date.year, today_date.month)[1]:
-                context['contacts'] = context['contacts'].filter(birthday__month=today_date.month,
-                                                                 birthday__day__range=(
-                                                                     today_date.day, today_date.day + 7))
-            elif today_date.day + 7 > monthrange(today_date.year, today_date.month)[1]:
-                diff_days = today_date.day + 7 - monthrange(today_date.year, today_date.month)[1]
-                context['contacts'] = context['contacts'].filter(Q(birthday__month=today_date.month + 1,
-                                                                 birthday__day__range=(
-                                                                     1, diff_days))|Q(birthday__month=today_date.month,
-                                                                                      birthday__day__range=(
-                                                                                          today_date.day,
-                                                                                          today_date.day + 7)))
-
-        if all_input is not None:
-            context['contacts'] = AddressBook.objects.filter(user=self.request.user)
 
         return context
 
@@ -144,90 +106,6 @@ class AddressBookDetail(LoginRequiredMixin, DetailView):
     model = AddressBook
     template_name = 'addressbook_detailview.html'
     context_object_name = 'contact'
-
-
-class NoteBookCreate(CreateView):
-    model = NoteBook
-
-    fields = ['title', 'description', 'tags']
-    template_name = 'notebook_add.html'
-    success_url = reverse_lazy('notes')
-
-    def form_valid(self, form):
-        tags = form.instance.tags
-        form.instance.user = self.request.user
-        if tags:
-            form.instance.tags = split(r'[,;+= ]', tags[0])
-        return super(NoteBookCreate, self).form_valid(form)
-
-
-class NoteBookDetail(LoginRequiredMixin, DetailView):
-    model = NoteBook
-    template_name = 'notebook_detail_view.html'
-    context_object_name = 'note'
-
-    def get_context_data(self, **kwargs):
-        context = super(NoteBookDetail, self).get_context_data(**kwargs)
-
-        return context
-
-
-class NoteBookUpdate(LoginRequiredMixin, UpdateView):
-    model = NoteBook
-    template_name = 'notebook_update.html'
-    fields = ['title', 'description', 'tags']
-    success_url = reverse_lazy('notes')
-
-
-class NoteBookView(LoginRequiredMixin, ListView):
-    model = NoteBook
-    template_name = 'notebook_listview.html'
-    context_object_name = 'notes'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(NoteBookView, self).get_context_data(**kwargs)
-        context['notes'] = context['notes'].filter(user=self.request.user)
-
-        tag_set = set()
-        search_input = self.request.GET.get('search-area')
-        filter_tags = get_tags_from_request(self.request.GET, self.request.user)
-
-        if filter_tags:
-            context['notes'] = context['notes'].filter(tags__overlap=filter_tags)
-
-        if search_input:
-            context['notes'] = context['notes'].filter(title__contains=search_input)
-            return context
-
-        for tag_item in context['notes'].values_list('tags', flat=True).order_by('tags'):
-            if tag_item:
-                for tag in tag_item:
-                    tag_set.add(tag)
-        context['filter_tags'] = tag_set
-        return context
-
-
-def get_tags_from_request(get_request, user):
-    all_tags = NoteBook.objects.filter(user=user).values_list('tags', flat=True)
-    searched_tags = []
-    for tag_item in all_tags:
-        if tag_item:
-            for tag in tag_item:
-                if get_request.get(tag):
-                    searched_tags.append(tag)
-    return searched_tags
-
-
-@login_required
-def delete_notebook(response, pk):
-    model = NoteBook.objects.filter(id=pk)
-    model.delete()
-    tag_set = set()
-    for tag_item in NoteBook.objects.values_list('tags', flat=True).order_by('tags'):
-        if tag_item:
-            for tag in tag_item:
-                tag_set.add(tag)
-    return redirect('notes')
 
 
 # @login_required
@@ -492,60 +370,3 @@ def currency_converter(request):
             'data': data, 'exchange_out': exchange_out
         })
     return render(request=request, template_name='currency.html', context={'data': data})
-
-
-#@login_required
-def file_filter():
-    EXTENDS = {
-        'IMAGES': ['png', 'jpeg', 'jpg', 'bmp'],
-        'DOCUMENTS': ['doc', 'docx', 'xls', 'xlsx', 'pdf'],
-        'VIDEO': ['avi', 'mkv', 'mp4'],
-        'MUSIC': ['mp3', 'vaw'],
-        # 'OTHER': []
-    }
-    FILE_LIST_BY_EXT = {
-        'IMAGES': [],
-        'DOCUMENTS': [],
-        'VIDEO': [],
-        'MUSIC': [],
-        'OTHER': [],
-        'ALL': []
-    }
-    path = "media/"
-    file_list = os.listdir(path)
-    for file in file_list:
-        ext_flag = False
-        l_ext = file.split('.')[-1]
-        for EXT in EXTENDS:
-            if l_ext in EXTENDS[EXT]:
-                ext_flag = EXT
-        if ext_flag:
-            FILE_LIST_BY_EXT[ext_flag].append(file)
-        else:
-            FILE_LIST_BY_EXT['OTHER'].append(file)
-        FILE_LIST_BY_EXT['ALL'].append(file)
-    return FILE_LIST_BY_EXT
-
-
-#@login_required
-def show_files(request, ext):
-    file_list = file_filter()
-    return render(request, 'show_files.html', {'file_list': file_list[ext]})
-
-
-#@login_required()
-def file_upload_view(request):
-    # form = UploadFileForm ()
-    success = False
-    file_list = False
-
-    if request.method == 'POST':
-        uploaded_file = request.FILES['document'] if "document" in request.FILES else False
-        if uploaded_file:
-            fs = FileSystemStorage()
-            fs.save(uploaded_file.name, uploaded_file)
-            success = True
-        else:
-            pass
-    file_list = file_filter()
-    return render(request, 'files.html', {'success': success, 'file_list': file_list.keys()})

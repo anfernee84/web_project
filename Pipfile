@@ -9,7 +9,6 @@ django-crispy-forms = "*"
 newsapi-python = "*"
 urllib3 = "*"
 pycountry = "*"
-pillow = "*"
 
 [dev-packages]
 
