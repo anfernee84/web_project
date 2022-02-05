@@ -1,0 +1,24 @@
+{% extends 'homepage.html' %}
+{% load crispy_forms_filters %}
+{% block content %}
+    <div class="container mb-4 mt-4">
+        <a href="{% url 'file' %}">
+            <button type="button" class="btn btn-dark">
+                Back to extends list
+            </button>
+        </a>
+        
+      <div class="row justify-content-center">
+        <div style="margin-top: 20px; text-align: left;">
+            <ul class="list-group list-group-flush">
+                {% if file_list %}
+                    {% for file in file_list %}
+                        <li class="list-group-item" ><a style="display: inline-block; text-decoration: none;" class="link-dark anim-link" href="../media/{{ file }}">{{ file }}</a></li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

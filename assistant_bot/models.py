@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 
 # Create your models here.
 
@@ -12,3 +13,8 @@ class AddressBook(models.Model):
     email = models.EmailField(blank=True, null=True)
     street = models.CharField(max_length=200, blank=True, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
+
+
+fs = FileSystemStorage(location='/media')
+class GetListFile(models.Model):
+    files = models.ImageField(storage=fs)

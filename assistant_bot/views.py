@@ -24,6 +24,11 @@ from datetime import datetime
 
 from pycountry import countries
 
+from distutils import file_util
+from idna import valid_contextj
+from .models import GetListFile
+from django.core.files.storage import FileSystemStorage
+import os
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -32,6 +37,58 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('homepage')
+
+def FileFilter ():
+    EXTENDS = {
+        'IMAGES': ['png', 'jpeg', 'jpg', 'bmp'],
+        'DOCUMENTS': ['doc', 'docx', 'xls', 'xlsx', 'pdf'],
+        'VIDEO': ['avi', 'mkv', 'mp4'],
+        'MUSIC': ['mp3', 'vaw'],
+        # 'OTHER': []
+    }
+    FILE_LIST_BY_EXT = {
+        'IMAGES': [],
+        'DOCUMENTS': [],
+        'VIDEO': [],
+        'MUSIC': [],
+        'OTHER': [],
+        'ALL': []
+    }
+    path = "media/"
+    # from pprint import pprint
+    file_list = os.listdir (path)
+    for file in file_list:
+        ext_flag = False
+        l_ext = file.split ('.')[-1]
+        for EXT in EXTENDS:
+            if l_ext in EXTENDS[EXT]:
+                ext_flag = EXT
+        if ext_flag:
+            FILE_LIST_BY_EXT[ext_flag].append (file)
+        else:
+            FILE_LIST_BY_EXT['OTHER'].append (file)
+        FILE_LIST_BY_EXT['ALL'].append (file)
+    return FILE_LIST_BY_EXT
+
+def ShowFiles (request, ext):
+    file_list = FileFilter ()
+    return render(request, 'show-files.html', {'file_list': file_list[ext]})
+
+def FileUploadView (request):
+    # form = UploadFileForm ()
+    success = False
+    file_list = False
+
+    if request.method == 'POST':
+        uploaded_file = request.FILES['document'] if "document" in request.FILES else False
+        if uploaded_file:
+            fs = FileSystemStorage()
+            fs.save (uploaded_file.name, uploaded_file)
+            success = True
+        else:
+            pass
+    file_list = FileFilter ()
+    return render(request, 'file.html', {'success': success, 'file_list': file_list.keys ()})
 
 
 class RegisterPage(FormView):
