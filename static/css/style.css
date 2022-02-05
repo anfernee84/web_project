@@ -8,9 +8,3 @@
 .navbar {
     z-index: 1;
 }
-html,
-body,
-header,
-.view {
-    height: 100%;
-}

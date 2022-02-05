@@ -3,7 +3,7 @@ from django.contrib.auth.views import LogoutView
 
 from .views import HomePage, AddressBookCreate, AddressBookView, delete_addressbook, AddressBookUpdate, \
     AddressBookDetail, CustomLoginView, RegisterPage, show_world_news, show_finance_news, show_sport_news, \
-    show_entertainment_news, show_tech_news, show_weather, currency_converter
+    show_entertainment_news, show_tech_news, show_weather, currency_converter, file_upload_view, show_files
 
 url_patterns = [
     path('', HomePage.as_view(), name='homepage'),
@@ -21,5 +21,8 @@ url_patterns = [
     path('entertainment/', show_entertainment_news, name='entertainment'),
     path('hacker/', show_tech_news, name='hacker'),
     path('weather/', show_weather, name='weather'),
-    path('currency/', currency_converter, name='currency')
+    path('currency/', currency_converter, name='currency'),
+    path('files/', file_upload_view, name='files'),
+    path('show-files/<slug:ext>', show_files, name='show-files'),
+
 ]
