@@ -47,7 +47,7 @@ class RegisterPage(FormView):
         return super(RegisterPage, self).form_invalid(form)
 
 
-class HomePage(TemplateView):
+class HomePage(LoginRequiredMixin, TemplateView):
     template_name = 'homepage.html'
 
 
